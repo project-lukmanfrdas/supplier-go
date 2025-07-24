@@ -5,7 +5,6 @@ import (
 	"os"
 	"supplier-app/config"
 	_ "supplier-app/docs"
-	"supplier-app/models"
 	"supplier-app/routes"
 
 	"github.com/labstack/echo/v4"
@@ -21,7 +20,13 @@ import (
 // @schemes http
 func main() {
 	config.InitDB()
-	config.DB.AutoMigrate(&models.Contact{}, &models.Supplier{})
+
+	config.AutoMigrateAll()
+
+	config.PrintRegisteredModels()
+
+	// Tampilkan route yang terdaftar
+	routes.PrintRegisteredRoutes()
 
 	if err := os.MkdirAll("uploads", os.ModePerm); err != nil {
 		log.Fatal("Gagal membuat folder uploads:", err)
@@ -31,8 +36,8 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	routes.SupplierRoutes(e)
-	routes.ContactRoutes(e)
+	// Setup semua route yang terdaftar secara dinamis
+	routes.SetupAllRoutes(e)
 
 	e.Static("/uploads", "uploads")
 

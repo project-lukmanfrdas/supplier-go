@@ -5,7 +5,6 @@ import (
 	"os"
 )
 
-// SaveFile menyimpan file yang diupload
 func SaveFile(src io.Reader, filepath string) error {
 	dst, err := os.Create(filepath)
 	if err != nil {
