@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+	"os"
 	"supplier-app/config"
 	_ "supplier-app/docs"
 	"supplier-app/models"
@@ -21,13 +23,19 @@ func main() {
 	config.InitDB()
 	config.DB.AutoMigrate(&models.Contact{}, &models.Supplier{})
 
+	if err := os.MkdirAll("uploads", os.ModePerm); err != nil {
+		log.Fatal("Gagal membuat folder uploads:", err)
+	}
+
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
 	routes.SupplierRoutes(e)
 	routes.ContactRoutes(e)
-	e.Static("/uploads", "uploads") // untuk akses gambar logo
+
+	e.Static("/uploads", "uploads")
+
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	e.Logger.Fatal(e.Start(":1323"))
